@@ -1,0 +1,100 @@
+#include <iostream>
+
+using namespace std;
+
+const int maxcar = 20; 
+const int maxx = 100; 
+
+struct Violation 
+{
+    char description[maxx];
+    Violation* next; 
+
+    Violation(const char* des) 
+    {
+        for (int i = 0; i < maxx && des[i] != '\0'; i++) 
+        {
+            description[i] = des[i];
+        }
+        description[maxx - 1] = '\0'; 
+        next = nullptr;
+    }
+};
+
+struct Node {
+    char carnum[maxcar]; 
+    Violation* violations; 
+    Node* left; 
+    Node* right; 
+
+    Node(const char* number) 
+{
+        for (int i = 0; i < maxcar && number[i] != '\0'; i++) 
+        {
+            carnum[i] = number[i];
+        }
+        carnum[maxcar - 1] = '\0';
+        violations = nullptr;
+        left = nullptr;
+        right = nullptr;
+    }
+};
+
+
+class Database 
+{
+private:
+    Node* root; 
+
+    void insert(Node*& node, const char* carnum, const char* violation) 
+    {
+        if (node == nullptr)
+        {
+            node = new Node(carnum); 
+            node->violations = new Violation(violation);
+        }
+        else if (strcmp(carnum, node->carnum) < 0) 
+        {
+            insert(node->left, carnum, violation); 
+        }
+        else if (strcmp(carnum, node->carnum) > 0) 
+        {
+            insert(node->right, carnum, violation);
+        }
+        else 
+        {
+            Violation* newviolation = new Violation(violation);
+            newviolation->next = node->violations; 
+            node->violations = newviolation;
+        }
+    }
+
+    void function(Node* node) const
+    {
+        if (node != nullptr) 
+        {
+            function(node->left); 
+            cout <<  node->carnum;
+            Violation* violation = node->violations;
+            while (violation != nullptr) 
+            {
+                std::cout << violation->description;
+                violation = violation->next;
+            }
+            function(node->right);
+        }
+    }
+
+public:
+    Database() : root{nullptr} {} 
+
+    void addviolation(const char* carnum, const char* violation) 
+    {
+        insert(root, carnum, violation);
+    }
+
+    void minifunction() const 
+    {
+        function(root);
+    }
+};
